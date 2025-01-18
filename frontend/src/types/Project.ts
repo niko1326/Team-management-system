@@ -1,4 +1,5 @@
-import {Task} from "./Task";
+import { Task } from './Task';
+import { Comment } from './Comment';
 
 export interface Project {
     id: string;
@@ -6,6 +7,6 @@ export interface Project {
     description: string;
     status: 'Active' | 'Inactive';
     teamId: string;
-    tasks?: Task[];
+    tasks: Task[]; // Ensure tasks is always defined
     comments?: Comment[];
 }

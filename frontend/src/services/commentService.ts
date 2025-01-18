@@ -1,31 +1,29 @@
-import axios from 'axios';
+import api from './apiConfig';
 import { Comment } from '../types/Comment';
-
-const API_URL = '/api/comments';
 
 // Fetch all comments for a specific project
 export const fetchCommentsByProject = async (projectId: string): Promise<Comment[]> => {
-    const response = await axios.get(`${API_URL}/project/${projectId}`);
+    const response = await api.get(`/comments/project/${projectId}`);
     return response.data;
 };
 
-// Add a new comment to a project
+// Add a new comment
 export const addComment = async (commentData: {
     content: string;
     author: string;
     projectId: string;
 }): Promise<Comment> => {
-    const response = await axios.post(API_URL, commentData);
+    const response = await api.post('/comments', commentData);
     return response.data;
 };
 
 // Delete a comment by ID
 export const deleteComment = async (commentId: string): Promise<void> => {
-    await axios.delete(`${API_URL}/${commentId}`);
+    await api.delete(`/comments/${commentId}`);
 };
 
-// Edit an existing comment
+// Edit a comment
 export const editComment = async (commentId: string, updatedContent: string): Promise<Comment> => {
-    const response = await axios.patch(`${API_URL}/${commentId}`, { content: updatedContent });
+    const response = await api.patch(`/comments/${commentId}`, { content: updatedContent });
     return response.data;
 };
