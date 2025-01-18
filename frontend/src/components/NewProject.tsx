@@ -1,64 +1,56 @@
-// src/components/NewProject.tsx
-
 import React, { useState } from 'react';
-import { createProject } from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import '../styles/styles.css'; // Import the stylesheet
 
-const NewProject = () => {
+const NewProject: React.FC = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [error, setError] = useState<string | null>(null);
-    const navigate = useNavigate();  // Changed from useHistory to useNavigate
+    const [status, setStatus] = useState('Active');
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-
-        const project = { name, description, startDate, endDate };
-
-        try {
-            await createProject(project);
-            navigate('/');  // Changed from history.push to navigate
-        } catch (err) {
-            setError('Failed to create project');
-        }
+        console.log({ name, description, status });
+        navigate('/projects'); // Redirect to the projects list
     };
 
     return (
-        <div>
-            <h1>Create a New Project</h1>
-            {error && <p>{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <label>Name</label>
-                <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                />
-                <label>Description</label>
-                <input
-                    type="text"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                />
-                <label>Start Date</label>
-                <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    required
-                />
-                <label>End Date</label>
-                <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    required
-                />
-                <button type="submit">Create Project</button>
+        <div className="new-project-container">
+            <h1 className="heading">Create New Project</h1>
+            <form onSubmit={handleSubmit} className="new-project-form">
+                <div className="form-group">
+                    <label htmlFor="name">Project Name</label>
+                    <input
+                        type="text"
+                        id="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Enter project name"
+                        required
+                    />
+                </div>
+                <div className="form-group">
+                    <label htmlFor="description">Description</label>
+                    <textarea
+                        id="description"
+                        value={description}
+                        onChange={(e) => setDescription(e.target.value)}
+                        placeholder="Enter project description"
+                        required
+                    ></textarea>
+                </div>
+                <div className="form-group">
+                    <label htmlFor="status">Status</label>
+                    <select
+                        id="status"
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                    >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <button type="submit" className="submit-button">Create Project</button>
             </form>
         </div>
     );

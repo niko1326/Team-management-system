@@ -1,20 +1,32 @@
-// src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';  // Importing necessary components for routing
-import ProjectList from './components/ProjectList';  // Importing the ProjectList component
-import ProjectDetail from './components/ProjectDetail';  // Importing the ProjectDetail component
-import NewProject from './components/NewProject';  // Importing the NewProject component
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import ProjectList from './components/ProjectList';
+import ProjectDetail from './components/ProjectDetail';
 
-const App = () => {
+const App: React.FC = () => {
+    const projects = [
+        { id: '1', name: 'Project Alpha', description: 'Alpha project description.', status: 'Active' },
+        { id: '2', name: 'Project Beta', description: 'Beta project description.', status: 'Inactive' },
+    ];
+
     return (
-        <Router>  {/* Wrapping the routes inside BrowserRouter */}
-            <Routes>  {/* Declaring the routes */}
-                <Route path="/" element={<ProjectList />} />  {/* Home page route that shows the list of projects */}
-                <Route path="/projects/:id" element={<ProjectDetail />} />  {/* Route for viewing project details by id */}
-                <Route path="/projects/new" element={<NewProject />} />  {/* Route for creating a new project */}
+        <Router>
+            <Routes>
+                <Route path="/" element={<ProjectListWrapper projects={projects} />} />
+                <Route path="/projects/:id" element={<ProjectDetailWrapper projects={projects} />} />
             </Routes>
         </Router>
     );
+};
+
+// Wrapper for ProjectList
+const ProjectListWrapper: React.FC<{ projects: any[] }> = ({ projects }) => {
+    return <ProjectList projects={projects} />;
+};
+
+// Wrapper for ProjectDetail
+const ProjectDetailWrapper: React.FC<{ projects: any[] }> = ({ projects }) => {
+    return <ProjectDetail projects={projects} />;
 };
 
 export default App;

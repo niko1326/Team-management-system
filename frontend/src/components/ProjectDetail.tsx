@@ -1,55 +1,50 @@
-// src/components/ProjectDetail.tsx
+import React from 'react';
+import { useParams, Link } from 'react-router-dom';
+import '../styles/styles.css'; // Import the stylesheet
 
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { getProjectById } from '../services/api';
+interface Task {
+    id: string;
+    name: string;
+    status: string;
+}
 
-const ProjectDetail = () => {
-    const { id } = useParams(); // Get project id from URL
-    const [project, setProject] = useState<any | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+interface Project {
+    id: string;
+    name: string;
+    description: string;
+    status: string;
+    tasks: Task[];
+}
 
-    useEffect(() => {
-        const fetchProject = async () => {
-            if (!id) {
-                setError('Project ID is missing');
-                setLoading(false);
-                return;
-            }
+interface ProjectDetailProps {
+    projects: Project[];
+}
 
-            try {
-                const data = await getProjectById(Number(id)); // Convert id to number
-                setProject(data);
-                setError(null);
-            } catch (err) {
-                setError('Failed to fetch project details.');
-            } finally {
-                setLoading(false);
-            }
-        };
+const ProjectDetail: React.FC<ProjectDetailProps> = ({ projects }) => {
+    const { id } = useParams<{ id: string }>();
+    const project = projects.find((p) => p.id === id);
 
-        // Fetch project data whenever the `id` changes
-        fetchProject();
-    }, [id]);  // `id` as dependency, re-run when it changes
-
-    if (loading) return <div>Loading...</div>;
-
-    if (error) return <div>{error}</div>;
+    if (!project) {
+        return <div>Project not found</div>;
+    }
 
     return (
-        <div>
-            <h1>Project Details</h1>
-            {project ? (
-                <>
-                    <h2>{project.name}</h2>
-                    <p>{project.description}</p>
-                    <p>Start Date: {project.startDate}</p>
-                    <p>End Date: {project.endDate}</p>
-                </>
-            ) : (
-                <p>No project data available.</p>
-            )}
+        <div className="project-detail-container">
+            <h1 className="project-name">{project.name}</h1>
+            <p className="project-description">{project.description}</p>
+            <span className={`status-badge status-${project.status.toLowerCase()}`}>{project.status}</span>
+
+            <h2 className="tasks-heading">Tasks</h2>
+            <ul className="tasks-list">
+                {project.tasks?.map((task) => (
+                    <li key={task.id} className={`task-item task-${task.status.toLowerCase()}`}>
+                        <span className="task-name">{task.name}</span>
+                        <span className={`task-status task-${task.status.toLowerCase()}`}>{task.status}</span>
+                    </li>
+                ))}
+            </ul>
+
+            <Link to="/projects" className="back-link">Back to Projects</Link>
         </div>
     );
 };

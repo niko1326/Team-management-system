@@ -1,48 +1,32 @@
-// src/components/ProjectList.tsx
-import React, { useEffect, useState } from 'react';
-import { getProjects } from '../services/api';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import '../styles/styles.css'; // Import the stylesheet
 
-const ProjectList = () => {
-    const [projects, setProjects] = useState<any[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+interface Project {
+    id: string;
+    name: string;
+    description: string;
+    status: string;
+}
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const data = await getProjects();
-                setProjects(data);
-                setError(null);
-            } catch (err) {
-                setError('Failed to fetch projects.');
-            } finally {
-                setLoading(false);
-            }
-        };
+interface ProjectListProps {
+    projects: Project[];
+}
 
-        fetchProjects();
-    }, []);
-
-    if (loading) return <div>Loading...</div>;
-
-    if (error) return <div>{error}</div>;
-
+const ProjectList: React.FC<ProjectListProps> = ({ projects }) => {
     return (
-        <div>
-            <h1>Projects</h1>
-            {projects.length === 0 ? (
-                <p>No projects available</p>
-            ) : (
-                <ul>
-                    {projects.map((project) => (
-                        <li key={project.id}>
-                            {/* Make sure the URL points to /projects/{id} */}
-                            <Link to={`/projects/${project.id}`}>{project.name}</Link>
-                        </li>
-                    ))}
-                </ul>
-            )}
+        <div className="project-list-container">
+            <h1 className="heading">Projects</h1>
+            <div className="project-list">
+                {projects.map((project) => (
+                    <div key={project.id} className="project-card">
+                        <h2 className="project-name">{project.name}</h2>
+                        <p className="project-description">{project.description}</p>
+                        <span className={`status-badge status-${project.status.toLowerCase()}`}>{project.status}</span>
+                        <Link to={`/projects/${project.id}`} className="view-details">View Details</Link>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
