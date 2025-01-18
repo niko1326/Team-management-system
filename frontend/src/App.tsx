@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import ProjectList from './components/ProjectList';
-import ProjectDetail from './components/ProjectDetail';
+import ProjectDetail from './components/Project/ProjectDetail';
 
 const App: React.FC = () => {
     const projects = [

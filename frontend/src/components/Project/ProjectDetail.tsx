@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import '../styles/styles.css'; // Import the stylesheet
+import '../../styles/styles.css'; // Import the stylesheet
 
 interface Task {
     id: string;
