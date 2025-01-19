@@ -3,16 +3,14 @@ import React from 'react';
 interface ProjectCardProps {
     name: string;
     description: string;
-    status: string;
     onClick: () => void;
 }
 
-const ProjectCard: React.FC<ProjectCardProps> = ({ name, description, status, onClick }) => {
+const ProjectCard: React.FC<ProjectCardProps> = ({ name, description, onClick }) => {
     return (
         <div className="project-card" onClick={onClick}>
             <h3>{name}</h3>
             <p>{description}</p>
-            <span className={`status ${status.toLowerCase()}`}>{status}</span>
         </div>
     );
 };

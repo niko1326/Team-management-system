@@ -1,6 +1,8 @@
+// Comment.java
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 @Entity
@@ -15,10 +17,12 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "task_id", nullable = true)
+    @JsonIgnore // Prevent recursive serialization
     private Task task;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = true)
+    @JsonIgnore // Prevent recursive serialization
     private Project project;
 
     @ManyToOne
@@ -77,3 +81,4 @@ public class Comment {
         this.author = author;
     }
 }
+

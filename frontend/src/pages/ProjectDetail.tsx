@@ -1,41 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import ProjectDetail from '../components/Project/ProjectDetail';
 import { fetchProjects } from '../services/projectService';
 import { Project } from '../types/Project';
 
-const ProjectDetailPage: React.FC = () => {
+const ProjectDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [project, setProject] = useState<Project | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadProjects = async () => {
+        const getProject = async () => {
             try {
-                const fetchedProjects = await fetchProjects();
-                const updatedProjects = fetchedProjects.map((project) => ({
-                    ...project,
-                    tasks: project.tasks || [], // Ensure tasks is an empty array if undefined
-                }));
-                setProjects(updatedProjects);
-            } catch (error) {
-                console.error('Failed to load projects:', error);
-            } finally {
-                setLoading(false);
+                const projects = await fetchProjects(); // Fetch all projects
+                const foundProject = projects.find((p) => p.id === parseInt(id || '', 10));
+                if (foundProject) {
+                    setProject(foundProject);
+                } else {
+                    setError('Project not found');
+                }
+            } catch (err) {
+                setError('Failed to fetch project details');
             }
         };
+        getProject();
+    }, [id]);
 
-        loadProjects();
-    }, []);
+    if (error) {
+        return <div>{error}</div>;
+    }
 
-    if (loading) return <p>Loading project details...</p>;
+    if (!project) {
+        return <div>Loading...</div>;
+    }
 
     return (
-        <div className="project-detail-page">
-            <h1 className="heading">Project Detail</h1>
-            <ProjectDetail projects={projects} />
+        <div className="project-detail">
+            <h2>{project.name}</h2>
+            <p>{project.description}</p>
         </div>
     );
 };
 
-export default ProjectDetailPage;
+export default ProjectDetail;

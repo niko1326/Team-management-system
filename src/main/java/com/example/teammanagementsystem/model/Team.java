@@ -1,6 +1,8 @@
+// Team.java
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
@@ -12,9 +14,10 @@ public class Team {
     private String name;
 
     @ManyToMany(mappedBy = "teams")
+    @JsonIgnore // Prevent recursive serialization
     private List<User> users;
 
-    @OneToMany(mappedBy = "team")  // Poprawa: relacja z Project, mappedBy odnosi się do pola 'team' w Project
+    @OneToMany(mappedBy = "team")
     private List<Project> projects;
 
     public Long getId() {

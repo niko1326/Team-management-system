@@ -1,6 +1,8 @@
+// Project.java
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,10 +18,11 @@ public class Project {
     private LocalDate endDate;
 
     @ManyToOne
-    @JoinColumn(name = "team_id")  // Relacja do zespołu
+    @JoinColumn(name = "team_id")
     private Team team;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonManagedReference // Prevent recursive serialization with tasks
     private List<Task> tasks;
 
     public Long getId() {

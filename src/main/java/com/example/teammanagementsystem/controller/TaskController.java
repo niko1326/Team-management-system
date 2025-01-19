@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -44,4 +46,23 @@ public class TaskController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<Task>> getTasksByProjectId(@PathVariable Long projectId) {
+        List<Task> tasks = taskService.getTasksByProjectId(projectId);
+        return ResponseEntity.ok(tasks);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<Task> updateTaskStatus(@PathVariable Long id, @RequestBody Map<String, String> updates) {
+        String status = updates.get("status");
+        if (status == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        Optional<Task> updatedTask = taskService.updateTaskStatus(id, status);
+        return updatedTask.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }

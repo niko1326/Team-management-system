@@ -8,7 +8,8 @@ export const fetchTasks = async (): Promise<Task[]> => {
 };
 
 // Fetch tasks by project ID
-export const fetchTasksByProject = async (projectId: string): Promise<Task[]> => {
+export const fetchTasksByProjectId = async (projectId: number): Promise<Task[]> => {
+    // Updated to match the new backend endpoint
     const response = await api.get(`/tasks/project/${projectId}`);
     return response.data;
 };
@@ -24,7 +25,7 @@ export const createTask = async (taskData: {
 };
 
 // Update a task
-export const updateTask = async (taskId: string, updatedData: Partial<Task>): Promise<Task> => {
+export const updateTask = async (taskId: number, updatedData: Partial<Task>): Promise<Task> => {
     const response = await api.patch(`/tasks/${taskId}`, updatedData);
     return response.data;
 };

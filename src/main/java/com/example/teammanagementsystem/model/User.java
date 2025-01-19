@@ -1,10 +1,12 @@
+// User.java
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 
 @Entity
-@Table(name = "app_user") // Zmiana nazwy tabeli
+@Table(name = "app_user")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,6 +21,7 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "team_id")
     )
+    @JsonIgnore // Prevent recursive serialization
     private List<Team> teams;
 
     public Long getId() {

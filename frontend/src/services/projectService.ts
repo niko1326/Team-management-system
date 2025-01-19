@@ -14,17 +14,19 @@ export const fetchProjectById = async (projectId: string): Promise<Project> => {
 };
 
 // Add a new project
-export const createProject = async (projectData: {
-    name: string;
-    description: string;
-    status: string;
-    teamId: string;
-}): Promise<Project> => {
+export const createProject = async (projectData: { name: string; description: string }): Promise<Project> => {
     const response = await api.post('/projects', projectData);
     return response.data;
 };
 
 // Delete a project by ID
-export const deleteProject = async (projectId: string): Promise<void> => {
+export const deleteProject = async (projectId: number): Promise<void> => {
     await api.delete(`/projects/${projectId}`);
+};
+
+
+// Update a project by ID
+export const updateProject = async (projectId: number, updatedData: Partial<Project>): Promise<Project> => {
+    const response = await api.put(`/projects/${projectId}`, updatedData);
+    return response.data;
 };

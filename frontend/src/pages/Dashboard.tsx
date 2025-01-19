@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../styles/styles.css'; // Import your styles
+import '../styles/styles.css'; // Import your styles
 
 const Dashboard: React.FC = () => {
     return (

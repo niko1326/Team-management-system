@@ -1,32 +1,45 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import ProjectList from './components/ProjectList';
-import ProjectDetail from './components/Project/ProjectDetail';
+import React, { useState, useEffect } from 'react';
+import ProjectSidebar from './components/Project/ProjectSidebar';
+import TaskManager from './components/Task/TaskManager';
+import TaskDetails from './components/Task/TaskDetails';
+import { fetchProjects } from './services/projectService';
+import { Project } from './types/Project';
+import { Task } from './types/Task';
 
 const App: React.FC = () => {
-    const projects = [
-        { id: '1', name: 'Project Alpha', description: 'Alpha project description.', status: 'Active' },
-        { id: '2', name: 'Project Beta', description: 'Beta project description.', status: 'Inactive' },
-    ];
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+
+    useEffect(() => {
+        const getProjects = async () => {
+            const data = await fetchProjects();
+            setProjects(data);
+            if (data.length > 0) {
+                setSelectedProjectId(data[0].id); // Select the first project by default
+            }
+        };
+        getProjects();
+    }, []);
 
     return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<ProjectListWrapper projects={projects} />} />
-                <Route path="/projects/:id" element={<ProjectDetailWrapper projects={projects} />} />
-            </Routes>
-        </Router>
+        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+            <ProjectSidebar
+                projects={projects}
+                setProjects={setProjects} // Pass setProjects function to update projects dynamically
+                onSelectProject={(id) => {
+                    setSelectedProjectId(id);
+                    setSelectedTask(null); // Reset selected task
+                }}
+                selectedProjectId={selectedProjectId}
+            />
+            <TaskManager
+                projectId={selectedProjectId}
+                onTaskSelect={(task) => setSelectedTask(task)}
+            />
+            <TaskDetails task={selectedTask} />
+        </div>
     );
-};
-
-// Wrapper for ProjectList
-const ProjectListWrapper: React.FC<{ projects: any[] }> = ({ projects }) => {
-    return <ProjectList projects={projects} />;
-};
-
-// Wrapper for ProjectDetail
-const ProjectDetailWrapper: React.FC<{ projects: any[] }> = ({ projects }) => {
-    return <ProjectDetail projects={projects} />;
 };
 
 export default App;

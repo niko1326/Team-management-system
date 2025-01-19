@@ -1,12 +1,12 @@
 import { Task } from './Task';
-import { Comment } from './Comment';
+import { Team } from './Team';
 
 export interface Project {
-    id: string;
+    id: number;
     name: string;
     description: string;
-    status: 'Active' | 'Inactive';
-    teamId: string;
-    tasks: Task[]; // Ensure tasks is always defined
-    comments?: Comment[];
+    startDate: string; // Using string to represent dates from the backend
+    endDate: string;
+    team?: Team; // Optional as it can be null
+    tasks?: Task[]; // Optional to account for potential absence
 }

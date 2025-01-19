@@ -1,6 +1,8 @@
+// Task.java
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.time.LocalDate;
 
 @Entity
@@ -11,11 +13,12 @@ public class Task {
 
     private String title;
     private String description;
-    private String status; // Możesz użyć Enum dla statusów
+    private String status;
     private LocalDate dueDate;
 
     @ManyToOne
     @JoinColumn(name = "project_id")
+    @JsonBackReference // Prevent recursive serialization with projects
     private Project project;
 
     public Long getId() {

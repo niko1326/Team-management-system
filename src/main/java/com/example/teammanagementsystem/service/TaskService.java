@@ -44,4 +44,17 @@ public class TaskService {
         }
         return false;
     }
+
+    public List<Task> getTasksByProjectId(Long projectId) {
+        return taskRepository.findByProjectId(projectId);
+    }
+
+    public Optional<Task> updateTaskStatus(Long id, String status) {
+        return taskRepository.findById(id).map(task -> {
+            task.setStatus(status); // Update only the status
+            return taskRepository.save(task); // Save changes
+        });
+    }
+
+
 }
