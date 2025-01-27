@@ -5,6 +5,8 @@ import com.example.teammanagementsystem.dto.LoginResponse;
 import com.example.teammanagementsystem.model.User;
 import com.example.teammanagementsystem.service.AuthService;
 import com.example.teammanagementsystem.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     public AuthController(AuthService authService) {
         this.authService = authService;
@@ -46,21 +49,42 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody AuthRequest request) {
         try {
-            User user = new User();
+            logger.info("Received signup request with data: username={}, email={}, isAdmin={}", 
+                request.getUsername(), 
+                request.getEmail(), 
+                request.isAdmin());
+            
+            User user = new User(request.isAdmin());
             user.setUsername(request.getUsername());
             user.setPassword(request.getPassword());
             user.setEmail(request.getEmail());
-            user.setAdmin(false);
+            
+            logger.info("Created user object before save: username={}, isAdmin={}", 
+                user.getUsername(), 
+                user.isAdmin());
             
             User savedUser = authService.createUser(user);
             
-            return ResponseEntity.ok(Map.of(
-                "success", true,
-                "username", savedUser.getUsername()
-            ));
+            logger.info("User saved: id={}, username={}, isAdmin={}", 
+                savedUser.getId(),
+                savedUser.getUsername(), 
+                savedUser.isAdmin());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("username", savedUser.getUsername());
+            response.put("isAdmin", savedUser.isAdmin());
+            response.put("email", savedUser.getEmail());
+            response.put("id", savedUser.getId());
+            
+            logger.info("Sending response with isAdmin={}", savedUser.isAdmin());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.badRequest()
-                .body(Map.of("success", false, "message", e.getMessage()));
+            logger.error("Error in signup: ", e);
+            return ResponseEntity.badRequest().body(Map.of(
+                "success", false,
+                "message", e.getMessage()
+            ));
         }
     }
 

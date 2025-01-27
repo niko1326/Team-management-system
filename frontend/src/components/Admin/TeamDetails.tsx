@@ -4,10 +4,11 @@ import { Project } from '../../types/Project';
 import { User } from '../../types/User';
 import { getTeamById } from '../../services/teamService';
 import { fetchProjectsByTeamId, deleteProject, createProject } from '../../services/projectService';
-import { fetchAllUsers, addUserToTeam, removeUserFromTeam } from '../../services/userService';
+import { fetchAllUsers, assignUserToTeam, addUserToTeam, removeUserFromTeam, updateUser } from '../../services/userService';
 import './AdminDashboard.css';
 import { FaTrash, FaPlus } from 'react-icons/fa';
 import ProjectDetails from '../Project/ProjectDetails';
+import UserForm from './UserForm';
 
 interface TeamDetailsProps {
     teamId: number;
@@ -26,6 +27,7 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const addProjectRef = useRef<HTMLDivElement | null>(null);
+    const [showAddUser, setShowAddUser] = useState<boolean>(false);
 
     const loadTeamData = async () => {
         try {
@@ -50,12 +52,12 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                     id: user.id,
                     username: user.username,
                     email: user.email,
-                    role: user.role,
+                    isAdmin: user.role === 'ADMIN',
                     teams: [{
                         id: teamId,
                         name: teamData.name
                     }]
-                } as User));
+                }));
                 setTeamUsers(mappedTeamUsers);
             }
         } catch (err) {
@@ -145,6 +147,16 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
         setEditingProject(null);
     };
 
+    const handleUserUpdate = async (userId: number, updates: Partial<User>) => {
+        try {
+            await updateUser(userId, updates);
+            await loadTeamData(); // Refresh the data
+        } catch (error) {
+            setError('Failed to update user');
+            console.error('Error updating user:', error);
+        }
+    };
+
     if (loading) return <div>Loading team details...</div>;
     if (error) return <div className="error-message">{error}</div>;
     if (!team) return <div>Team not found</div>;
@@ -210,6 +222,15 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                 </div>
             ) : (
                 <div className="users-list">
+                    <div className="users-header">
+                        <h2>Users</h2>
+                        <button 
+                            className="add-user-button"
+                            onClick={() => setShowAddUser(true)}
+                        >
+                            <FaPlus /> Add User
+                        </button>
+                    </div>
                     {allUsers.map(user => (
                         <div key={user.id} className="user-card">
                             <div className="user-checkbox">
@@ -227,7 +248,7 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                                         Teams: {user.teams.map(t => t.name).join(', ')}
                                     </div>
                                 )}
-                                {user.role === 'ADMIN' && <span className="admin-badge">Admin</span>}
+                                {user.isAdmin && <span className="admin-badge">Admin</span>}
                             </div>
                         </div>
                     ))}
@@ -239,6 +260,17 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                     project={editingProject}
                     onClose={() => setEditingProject(null)}
                     onUpdate={handleProjectUpdate}
+                />
+            )}
+
+            {showAddUser && (
+                <UserForm
+                    onClose={() => setShowAddUser(false)}
+                    onUserCreated={async (newUser) => {
+                        setAllUsers(prev => [...prev, newUser]);
+                        setShowAddUser(false);
+                        await loadTeamData();
+                    }}
                 />
             )}
         </div>

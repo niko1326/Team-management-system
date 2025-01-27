@@ -24,7 +24,7 @@ public class User {
     private String email;
 
     @Column(name = "is_admin", nullable = false)
-    private boolean isAdmin;
+    private boolean isAdmin = false;
 
     @ManyToMany
     @JoinTable(
@@ -33,6 +33,14 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "team_id")
     )
     private Set<Team> teams = new HashSet<>();
+
+    public User() {
+        this.isAdmin = false;
+    }
+
+    public User(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
 
     public Long getId() {
         return id;

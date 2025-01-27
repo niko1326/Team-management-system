@@ -11,6 +11,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import java.util.Date;
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class AuthService {
@@ -18,6 +20,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private static final SecretKey JWT_KEY = Jwts.SIG.HS256.key().build();
     private final long jwtExpiration = 86400000; // 24 hours in milliseconds
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
 
     @Autowired
     public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -50,8 +53,32 @@ public class AuthService {
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
+        
+        logger.info("Creating user in service: username={}, isAdmin={}", 
+            user.getUsername(), 
+            user.isAdmin());
+        
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userRepository.save(user);
+        
+        logger.info("After password encoding: username={}, isAdmin={}", 
+            user.getUsername(), 
+            user.isAdmin());
+        
+        User savedUser = userRepository.save(user);
+        
+        logger.info("After initial save: username={}, isAdmin={}", 
+            savedUser.getUsername(), 
+            savedUser.isAdmin());
+        
+        // Force reload from database
+        User reloadedUser = userRepository.findById(savedUser.getId())
+            .orElseThrow(() -> new RuntimeException("User not found after save"));
+        
+        logger.info("After reload from DB: username={}, isAdmin={}", 
+            reloadedUser.getUsername(), 
+            reloadedUser.isAdmin());
+        
+        return reloadedUser;
     }
 
     public boolean verifyToken(String token) {

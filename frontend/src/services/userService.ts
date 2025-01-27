@@ -54,4 +54,40 @@ export const assignUserToTeam = async (userId: number, teamId: number | null): P
         console.error('Error assigning user to team:', error);
         throw error;
     }
+};
+
+export const updateUser = async (userId: number, updates: Partial<User>): Promise<User> => {
+    try {
+        const response = await api.put(`/api/admin/users/${userId}`, updates);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user:', error);
+        throw error;
+    }
+};
+
+export const createUser = async (userData: {
+    username: string;
+    email: string;
+    password: string;
+    isAdmin: boolean;
+}): Promise<User> => {
+    try {
+        console.log('Creating user with data:', userData);
+        const response = await api.post('/api/auth/signup', userData);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating user:', error);
+        throw error;
+    }
+};
+
+export const updateUserRole = async (userId: number, isAdmin: boolean): Promise<User> => {
+    try {
+        const response = await api.put(`/api/admin/users/${userId}`, { isAdmin });
+        return response.data;
+    } catch (error) {
+        console.error('Error updating user role:', error);
+        throw error;
+    }
 }; 

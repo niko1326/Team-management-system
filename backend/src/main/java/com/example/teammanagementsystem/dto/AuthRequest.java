@@ -4,6 +4,7 @@ public class AuthRequest {
     private String username;
     private String password;
     private String email;
+    private boolean isAdmin;
 
     // Getters and Setters
     public String getUsername() {
@@ -28,5 +29,13 @@ public class AuthRequest {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public boolean isAdmin() {
+        return isAdmin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.isAdmin = admin;
     }
 } 

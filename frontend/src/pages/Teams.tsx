@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import TeamTable from '../components/Team/TeamTable';
 import { fetchTeams } from '../services/teamService';
 import { Team } from '../types/Team';
+import { FaUsers, FaProjectDiagram } from 'react-icons/fa';
+import '../styles/Teams.css';
 
 const Teams: React.FC = () => {
     const [teams, setTeams] = useState<Team[]>([]);
@@ -22,12 +23,28 @@ const Teams: React.FC = () => {
         loadTeams();
     }, []);
 
-    if (loading) return <p>Loading teams...</p>;
+    if (loading) return <div className="loading">Loading teams...</div>;
 
     return (
         <div className="teams-container">
-            <h1 className="heading">Teams</h1>
-            <TeamTable teams={teams} />
+            <h1>Teams</h1>
+            <div className="teams-grid">
+                {teams.map(team => (
+                    <div key={team.id} className="team-card">
+                        <h2>{team.name}</h2>
+                        <div className="team-stats">
+                            <div className="stat">
+                                <FaUsers className="stat-icon" />
+                                <span>{team.users.length} Members</span>
+                            </div>
+                            <div className="stat">
+                                <FaProjectDiagram className="stat-icon" />
+                                <span>{team.projects.length} Projects</span>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
     );
 };
