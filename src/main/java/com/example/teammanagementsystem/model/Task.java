@@ -2,7 +2,7 @@
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDate;
 
 @Entity
@@ -13,13 +13,19 @@ public class Task {
 
     private String title;
     private String description;
-    private String status;
     private LocalDate dueDate;
 
-    @ManyToOne
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status = TaskStatus.TODO;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
-    @JsonBackReference // Prevent recursive serialization with projects
+    @JsonIgnoreProperties({"tasks", "team"})
     private Project project;
+
+    public enum TaskStatus {
+        TODO, DONE
+    }
 
     public Long getId() {
         return id;
@@ -45,14 +51,6 @@ public class Task {
         this.description = description;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
     public LocalDate getDueDate() {
         return dueDate;
     }
@@ -61,11 +59,30 @@ public class Task {
         this.dueDate = dueDate;
     }
 
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
     public Project getProject() {
         return project;
     }
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public Long getProjectId() {
+        return project != null ? project.getId() : null;
+    }
+
+    public void setProjectId(Long projectId) {
+        if (this.project == null || !this.project.getId().equals(projectId)) {
+            this.project = new Project();
+            this.project.setId(projectId);
+        }
     }
 }

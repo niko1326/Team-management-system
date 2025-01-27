@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react';
 import ProjectCard from '../components/Project/ProjectCard';
 import { fetchProjects } from '../services/projectService';
 import { Project } from '../types/Project';
+import './Projects.css';
+import { useAuth } from '../contexts/AuthContext';
 
 const Projects: React.FC = () => {
+    const { user } = useAuth();
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -11,8 +14,10 @@ const Projects: React.FC = () => {
     useEffect(() => {
         const getProjects = async () => {
             try {
-                const data = await fetchProjects();
-                setProjects(data);
+                if (user?.username) {
+                    const data = await fetchProjects(user.username);
+                    setProjects(data);
+                }
             } catch (err) {
                 setError('Failed to fetch projects');
                 console.error(err);
@@ -22,7 +27,7 @@ const Projects: React.FC = () => {
         };
 
         getProjects();
-    }, []);
+    }, [user]);
 
     if (loading) {
         return <div>Loading...</div>;
@@ -33,14 +38,14 @@ const Projects: React.FC = () => {
     }
 
     return (
-        <div className="projects-page">
+        <div className="projects-container">
             <h1>Projects</h1>
-            <div className="project-list">
+            <div className="projects-grid">
                 {projects.map((project) => (
                     <ProjectCard
                         key={project.id}
                         name={project.name}
-                        description={project.description}
+                        description={project.description || ''}
                         onClick={() => console.log(`Clicked project: ${project.name}`)}
                     />
                 ))}

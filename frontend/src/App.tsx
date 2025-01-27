@@ -1,44 +1,41 @@
-import React, { useState, useEffect } from 'react';
-import ProjectSidebar from './components/Project/ProjectSidebar';
-import TaskManager from './components/Task/TaskManager';
-import TaskDetails from './components/Task/TaskDetails';
-import { fetchProjects } from './services/projectService';
-import { Project } from './types/Project';
-import { Task } from './types/Task';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from './components/Auth/Login';
+import Signup from './components/Auth/Signup';
+import Dashboard from './components/Dashboard/Dashboard';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import PrivateRoute from './components/PrivateRoute';
+import AdminRoute from './components/AdminRoute';
+import { AuthProvider } from './contexts/AuthContext';
+import './App.css';
 
 const App: React.FC = () => {
-    const [projects, setProjects] = useState<Project[]>([]);
-    const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
-    const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-
-    useEffect(() => {
-        const getProjects = async () => {
-            const data = await fetchProjects();
-            setProjects(data);
-            if (data.length > 0) {
-                setSelectedProjectId(data[0].id); // Select the first project by default
-            }
-        };
-        getProjects();
-    }, []);
-
     return (
-        <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-            <ProjectSidebar
-                projects={projects}
-                setProjects={setProjects} // Pass setProjects function to update projects dynamically
-                onSelectProject={(id) => {
-                    setSelectedProjectId(id);
-                    setSelectedTask(null); // Reset selected task
-                }}
-                selectedProjectId={selectedProjectId}
-            />
-            <TaskManager
-                projectId={selectedProjectId}
-                onTaskSelect={(task) => setSelectedTask(task)}
-            />
-            <TaskDetails task={selectedTask} />
-        </div>
+        <Router>
+            <AuthProvider>
+                <Routes>
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route
+                        path="/admin"
+                        element={
+                            <AdminRoute>
+                                <AdminDashboard />
+                            </AdminRoute>
+                        }
+                    />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <PrivateRoute>
+                                <Dashboard />
+                            </PrivateRoute>
+                        }
+                    />
+                    <Route path="/" element={<Navigate to="/login" />} />
+                </Routes>
+            </AuthProvider>
+        </Router>
     );
 };
 

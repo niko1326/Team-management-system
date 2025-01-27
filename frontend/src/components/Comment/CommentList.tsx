@@ -1,47 +1,40 @@
 import React from 'react';
-
-interface Comment {
-    id: string;
-    content: string;
-    author: string;
-    createdAt: string;
-}
+import { Comment } from '../../types/Comment';
+import './CommentList.css';
 
 interface CommentListProps {
     comments: Comment[];
-    onDelete?: (id: string) => void; // Optional delete callback
+    onDelete?: (commentId: number) => void;
 }
 
 const CommentList: React.FC<CommentListProps> = ({ comments, onDelete }) => {
+    if (!comments || comments.length === 0) {
+        return <div className="no-comments">No comments yet</div>;
+    }
+
     return (
-        <div className="comment-list-container">
-            <h2>Comments</h2>
-            {comments.length === 0 ? (
-                <p>No comments available.</p>
-            ) : (
-                <ul className="comment-list">
-                    {comments.map((comment) => (
-                        <li key={comment.id} className="comment-item">
-                            <p>{comment.content}</p>
-                            <div className="comment-meta">
-                                <span>By: {comment.author}</span>
-                                <span> | </span>
-                                <span>{new Date(comment.createdAt).toLocaleString()}</span>
-                            </div>
-                            {onDelete && (
-                                <button
-                                    className="delete-button"
-                                    onClick={() => onDelete(comment.id)}
-                                >
-                                    Delete
-                                </button>
-                            )}
-                        </li>
-                    ))}
-                </ul>
-            )}
+        <div className="comment-list">
+            {comments.map((comment) => (
+                <div key={comment.id} className="comment-item">
+                    <div className="comment-header">
+                        <span className="comment-author">{comment.username || 'Anonymous'}</span>
+                        <span className="comment-date">
+                            {new Date(comment.createdAt).toLocaleString()}
+                        </span>
+                    </div>
+                    <div className="comment-content">{comment.content}</div>
+                    {onDelete && (
+                        <button 
+                            onClick={() => onDelete(comment.id)}
+                            className="delete-comment"
+                        >
+                            Delete
+                        </button>
+                    )}
+                </div>
+            ))}
         </div>
     );
 };
 
-export default CommentList;
+export default CommentList; 

@@ -1,7 +1,11 @@
+import { Task } from './Task';
+import { Project } from './Project';
+
 export interface Comment {
-    id: string;
+    id: number;
     content: string;
-    author: string;
-    projectId: string;
     createdAt: string;
+    task?: Task;
+    project?: Project;
+    username?: string;
 }

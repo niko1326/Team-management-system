@@ -2,11 +2,11 @@
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import java.time.LocalDate;
-import java.util.List;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
+@Table(name = "projects")
 public class Project {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,16 +14,14 @@ public class Project {
 
     private String name;
     private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "team_id")
+    @JsonBackReference
     private Team team;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    @JsonManagedReference // Prevent recursive serialization with tasks
-    private List<Task> tasks;
+    private Set<Task> tasks;
 
     public Long getId() {
         return id;
@@ -49,27 +47,19 @@ public class Project {
         this.description = description;
     }
 
-    public LocalDate getStartDate() {
-        return startDate;
+    public Team getTeam() {
+        return team;
     }
 
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
+    public void setTeam(Team team) {
+        this.team = team;
     }
 
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public List<Task> getTasks() {
+    public Set<Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(List<Task> tasks) {
+    public void setTasks(Set<Task> tasks) {
         this.tasks = tasks;
     }
 }

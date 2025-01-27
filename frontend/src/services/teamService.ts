@@ -1,40 +1,58 @@
-import api from './apiConfig';
+import api from './api';
 import { Team } from '../types/Team';
+import { useAuth } from '../contexts/AuthContext';
 
-// Fetch all teams
+// Fetch all teams (admin only)
 export const fetchTeams = async (): Promise<Team[]> => {
-    const response = await api.get('/teams');
-
-    // Transform to include members from USER_TEAMS
-    const teamsWithMembers = await Promise.all(
-        response.data.map(async (team: Team) => {
-            const membersResponse = await api.get(`/teams/${team.id}/members`);
-            return {
-                ...team,
-                members: membersResponse.data, // Populate members from the API
-            };
-        })
-    );
-
-    return teamsWithMembers;
+    try {
+        const response = await api.get('/api/admin/teams');
+        console.log('Teams response:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching teams:', error);
+        throw new Error('Access forbidden - Admin privileges required');
+    }
 };
 
-// Fetch a single team by ID
-export const fetchTeamById = async (teamId: string): Promise<Team> => {
-    const response = await api.get(`/teams/${teamId}`);
-    return response.data;
+// Fetch a single team by ID (admin only)
+export const getTeamById = async (id: number): Promise<Team> => {
+    try {
+        const response = await api.get(`/api/admin/teams/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching team:', error);
+        throw error;
+    }
 };
 
 // Add a new team
-export const createTeam = async (teamData: {
-    name: string;
-    description: string;
-}): Promise<Team> => {
-    const response = await api.post('/teams', teamData);
-    return response.data;
+export const createTeam = async (team: Partial<Team>): Promise<Team> => {
+    try {
+        const response = await api.post('/api/teams', team);
+        return response.data;
+    } catch (error) {
+        console.error('Error creating team:', error);
+        throw error;
+    }
+};
+
+// Update a team
+export const updateTeam = async (id: number, team: Partial<Team>): Promise<Team> => {
+    try {
+        const response = await api.put(`/api/teams/${id}`, team);
+        return response.data;
+    } catch (error) {
+        console.error('Error updating team:', error);
+        throw error;
+    }
 };
 
 // Delete a team by ID
-export const deleteTeam = async (teamId: string): Promise<void> => {
-    await api.delete(`/teams/${teamId}`);
+export const deleteTeam = async (id: number): Promise<void> => {
+    try {
+        await api.delete(`/teams/${id}`);
+    } catch (error) {
+        console.error('Error deleting team:', error);
+        throw error;
+    }
 };

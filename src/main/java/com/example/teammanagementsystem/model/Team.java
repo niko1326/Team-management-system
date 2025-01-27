@@ -2,10 +2,11 @@
 package com.example.teammanagementsystem.model;
 
 import jakarta.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
+@Table(name = "teams")
 public class Team {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -13,13 +14,19 @@ public class Team {
 
     private String name;
 
-    @ManyToMany(mappedBy = "teams")
-    @JsonIgnore // Prevent recursive serialization
-    private List<User> users;
-
     @OneToMany(mappedBy = "team")
+    @JsonManagedReference
     private List<Project> projects;
 
+    @ManyToMany
+    @JoinTable(
+        name = "team_users",
+        joinColumns = @JoinColumn(name = "team_id"),
+        inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private List<User> users;
+
+    // Getters and setters
     public Long getId() {
         return id;
     }
