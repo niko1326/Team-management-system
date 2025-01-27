@@ -4,7 +4,7 @@ import { Project } from '../../types/Project';
 import { User } from '../../types/User';
 import { getTeamById } from '../../services/teamService';
 import { fetchProjectsByTeamId, deleteProject, createProject } from '../../services/projectService';
-import { fetchAllUsers, assignUserToTeam, addUserToTeam, removeUserFromTeam } from '../../services/userService';
+import { fetchAllUsers, addUserToTeam, removeUserFromTeam } from '../../services/userService';
 import './AdminDashboard.css';
 import { FaTrash, FaPlus } from 'react-icons/fa';
 import ProjectDetails from '../Project/ProjectDetails';
@@ -50,12 +50,12 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                     id: user.id,
                     username: user.username,
                     email: user.email,
-                    isAdmin: user.role === 'ADMIN',
+                    role: user.role,
                     teams: [{
                         id: teamId,
                         name: teamData.name
                     }]
-                }));
+                } as User));
                 setTeamUsers(mappedTeamUsers);
             }
         } catch (err) {
@@ -227,7 +227,7 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                                         Teams: {user.teams.map(t => t.name).join(', ')}
                                     </div>
                                 )}
-                                {user.isAdmin && <span className="admin-badge">Admin</span>}
+                                {user.role === 'ADMIN' && <span className="admin-badge">Admin</span>}
                             </div>
                         </div>
                     ))}

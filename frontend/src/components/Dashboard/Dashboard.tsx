@@ -138,7 +138,6 @@ const Dashboard: React.FC = () => {
                         setSelectedTask(null);
                         setEditingProject(project);
                     }}
-                    onAddProject={handleAddProject}
                 />
                 <div className="main-content">
                     <TaskManager
