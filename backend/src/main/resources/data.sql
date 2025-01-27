@@ -1,0 +1,2 @@
+CREATE USER admin PASSWORD 'adminpassword';
+GRANT ALL PRIVILEGES TO admin;

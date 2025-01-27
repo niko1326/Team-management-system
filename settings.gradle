@@ -1,1 +1,3 @@
-rootProject.name = 'Team-management-system'
+rootProject.name = 'team-management-system'
+include 'backend'
+include 'frontend'

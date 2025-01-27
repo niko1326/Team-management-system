@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Team } from '../../types/Team';
 import { Project } from '../../types/Project';
 import { User } from '../../types/User';
 import { getTeamById } from '../../services/teamService';
-import { fetchProjectsByTeamId } from '../../services/projectService';
+import { fetchProjectsByTeamId, deleteProject, createProject } from '../../services/projectService';
 import { fetchAllUsers, assignUserToTeam, addUserToTeam, removeUserFromTeam } from '../../services/userService';
 import './AdminDashboard.css';
+import { FaTrash, FaPlus } from 'react-icons/fa';
+import ProjectDetails from '../Project/ProjectDetails';
 
 interface TeamDetailsProps {
     teamId: number;
@@ -19,6 +21,11 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
     const [allUsers, setAllUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [showAddProject, setShowAddProject] = useState<boolean>(false);
+    const [newProjectTitle, setNewProjectTitle] = useState<string>('');
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+    const [editingProject, setEditingProject] = useState<Project | null>(null);
+    const addProjectRef = useRef<HTMLDivElement | null>(null);
 
     const loadTeamData = async () => {
         try {
@@ -81,6 +88,63 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
         return teamUsers.some(user => user.id === userId);
     };
 
+    const handleDeleteProject = async (projectId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.confirm('Are you sure you want to delete this project?')) {
+            try {
+                await deleteProject(projectId);
+                setProjects(prev => prev.filter(project => project.id !== projectId));
+            } catch (err) {
+                console.error('Error deleting project:', err);
+            }
+        }
+    };
+
+    // Add click outside handler
+    const handleClickOutside = (event: MouseEvent) => {
+        if (addProjectRef.current && !addProjectRef.current.contains(event.target as Node)) {
+            setShowAddProject(false);
+        }
+    };
+
+    useEffect(() => {
+        if (showAddProject) {
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showAddProject]);
+
+    const handleAddProject = async () => {
+        if (!newProjectTitle.trim() || !teamId) return;
+
+        try {
+            const newProject = await createProject({
+                name: newProjectTitle.trim(),
+                description: '',
+                team: { id: teamId } as Team
+            });
+            setProjects(prev => [...prev, newProject]);
+            setNewProjectTitle('');
+            setShowAddProject(false);
+        } catch (error) {
+            console.error('Failed to create project:', error);
+        }
+    };
+
+    const handleProjectSelect = (project: Project) => {
+        setShowAddProject(false);
+        setEditingProject(project);
+    };
+
+    const handleProjectUpdate = (updatedProject: Project) => {
+        setProjects(prev => prev.map(project => 
+            project.id === updatedProject.id ? updatedProject : project
+        ));
+        setEditingProject(null);
+    };
+
     if (loading) return <div>Loading team details...</div>;
     if (error) return <div className="error-message">{error}</div>;
     if (!team) return <div>Team not found</div>;
@@ -90,17 +154,58 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
             <h2>{team.name}</h2>
             {viewMode === 'projects' ? (
                 <div className="project-manager">
-                    <div className="projects-grid">
+                    <div className="project-list">
                         {projects.map(project => (
-                            <div key={project.id} className="project-item">
-                                <div className="project-header">
-                                    <h3>{project.name}</h3>
-                                </div>
+                            <div 
+                                key={project.id}
+                                className="project-item"
+                                onClick={() => handleProjectSelect(project)}
+                            >
                                 <div className="project-content">
-                                    <p>{project.description}</p>
+                                    <div className="project-text">
+                                        <h3>{project.name}</h3>
+                                        <p className="project-description">
+                                            {project.description || 'No description provided'}
+                                        </p>
+                                    </div>
+                                    <button 
+                                        className="delete-button"
+                                        onClick={(e) => handleDeleteProject(project.id, e)}
+                                    >
+                                        <FaTrash />
+                                    </button>
                                 </div>
                             </div>
                         ))}
+                    </div>
+                    <div className="add-project-section" ref={addProjectRef}>
+                        {showAddProject ? (
+                            <div className="add-project-form">
+                                <input
+                                    type="text"
+                                    placeholder="Enter project name"
+                                    value={newProjectTitle}
+                                    onChange={(e) => setNewProjectTitle(e.target.value)}
+                                    className="project-input"
+                                />
+                                <button onClick={handleAddProject} className="add-button">
+                                    Add Project
+                                </button>
+                                <button onClick={() => setShowAddProject(false)} className="cancel-button">
+                                    Cancel
+                                </button>
+                            </div>
+                        ) : (
+                            <button 
+                                onClick={() => {
+                                    setEditingProject(null);
+                                    setShowAddProject(true);
+                                }} 
+                                className="add-project-button"
+                            >
+                                <FaPlus /> Add Project
+                            </button>
+                        )}
                     </div>
                 </div>
             ) : (
@@ -127,6 +232,14 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                         </div>
                     ))}
                 </div>
+            )}
+            
+            {editingProject && (
+                <ProjectDetails
+                    project={editingProject}
+                    onClose={() => setEditingProject(null)}
+                    onUpdate={handleProjectUpdate}
+                />
             )}
         </div>
     );

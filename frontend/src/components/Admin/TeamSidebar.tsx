@@ -1,90 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Team } from '../../types/Team';
-import { fetchTeams } from '../../services/teamService';
-import { useAuth } from '../../contexts/AuthContext';
-import TeamForm from '../Admin/TeamForm';
-import { FaPlus } from 'react-icons/fa';
-import './AdminDashboard.css';
+import { deleteTeam } from '../../services/teamService';
+import { FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
+import './TeamSidebar.css';
 
 interface TeamSidebarProps {
+    teams: Team[];
     selectedTeamId: number | null;
-    onTeamSelect: (teamId: number) => void;
+    onTeamSelect: (teamId: number | null) => void;
+    setTeams: React.Dispatch<React.SetStateAction<Team[]>>;
+    onEditTeam: (team: Team) => void;
+    onAddTeam?: () => void;
 }
 
-const TeamSidebar: React.FC<TeamSidebarProps> = ({ selectedTeamId, onTeamSelect }) => {
-    const [teams, setTeams] = useState<Team[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [showTeamForm, setShowTeamForm] = useState(false);
-    const { isAdmin } = useAuth();
-
-    useEffect(() => {
-        if (!isAdmin) {
-            setError('Admin access required');
-            setLoading(false);
-            return;
-        }
-
-        const loadTeams = async () => {
+const TeamSidebar: React.FC<TeamSidebarProps> = ({
+    teams,
+    selectedTeamId,
+    onTeamSelect,
+    setTeams,
+    onEditTeam,
+    onAddTeam
+}) => {
+    const handleDeleteTeam = async (teamId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.confirm('Are you sure you want to delete this team?')) {
             try {
-                setLoading(true);
-                setError(null);
-                console.log('Fetching teams...');
-                const fetchedTeams = await fetchTeams();
-                console.log('Fetched teams:', fetchedTeams);
-                setTeams(fetchedTeams);
-                if (fetchedTeams.length > 0 && !selectedTeamId) {
-                    onTeamSelect(fetchedTeams[0].id);
+                await deleteTeam(teamId);
+                setTeams(prev => prev.filter(team => team.id !== teamId));
+                if (selectedTeamId === teamId) {
+                    onTeamSelect(null);
                 }
             } catch (err) {
-                console.error('Error loading teams:', err);
-                setError('Failed to load teams. Please try logging in again.');
-            } finally {
-                setLoading(false);
+                console.error('Error deleting team:', err);
+                alert('Error deleting team. Please try again.');
             }
-        };
-
-        loadTeams();
-    }, [isAdmin, selectedTeamId, onTeamSelect]);
-
-    const handleAddTeam = () => {
-        setShowTeamForm(true);
+        }
     };
-
-    const handleTeamCreated = (newTeam: Team) => {
-        setTeams(prev => [...prev, newTeam]);
-        setShowTeamForm(false);
-    };
-
-    if (loading) return <div>Loading teams...</div>;
-    if (error) return <div className="error-message">{error}</div>;
-    if (!isAdmin) return <div className="error-message">Admin access required</div>;
 
     return (
         <div className="team-sidebar">
-            <div className="sidebar-header">
+            <div className="team-header">
                 <h2>Teams</h2>
-                <button className="add-button" onClick={handleAddTeam}>
+                <button 
+                    className="add-team-button"
+                    onClick={onAddTeam}
+                    title="Add new team"
+                >
                     <FaPlus />
                 </button>
             </div>
             <div className="team-list">
-                {teams.map(team => (
+                {teams.map((team) => (
                     <div
                         key={team.id}
-                        className={`team-item ${selectedTeamId === team.id ? 'selected' : ''}`}
+                        className={`team-item ${team.id === selectedTeamId ? 'selected' : ''}`}
                         onClick={() => onTeamSelect(team.id)}
                     >
-                        {team.name}
+                        <div className="team-content">
+                            <div className="team-text">
+                                <h3>{team.name}</h3>
+                            </div>
+                            <button 
+                                className="edit-button action-button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onEditTeam(team);
+                                }}
+                            >
+                                <FaEdit />
+                            </button>
+                            <button 
+                                className="delete-button action-button"
+                                onClick={(e) => handleDeleteTeam(team.id, e)}
+                            >
+                                <FaTrash />
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>
-            {showTeamForm && (
-                <TeamForm
-                    onClose={() => setShowTeamForm(false)}
-                    onTeamCreated={handleTeamCreated}
-                />
-            )}
         </div>
     );
 };

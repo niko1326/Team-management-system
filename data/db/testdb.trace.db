@@ -34,3 +34,6 @@ SELECT * FROM TEAM_USER [42102-224]
 2025-01-27 20:41:35.813609+01:00 jdbc[3]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEAM_USER" not found; SQL statement:
 SELECT * FROM TEAM_USER [42102-224]
+2025-01-27 21:35:18.734326+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "TEAM_USER" not found; SQL statement:
+SELECT * FROM TEAM_USER [42102-224]

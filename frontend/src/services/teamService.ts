@@ -39,7 +39,7 @@ export const createTeam = async (team: Partial<Team>): Promise<Team> => {
 // Update a team
 export const updateTeam = async (id: number, team: Partial<Team>): Promise<Team> => {
     try {
-        const response = await api.put(`/api/teams/${id}`, team);
+        const response = await api.put(`/api/admin/teams/${id}`, team);
         return response.data;
     } catch (error) {
         console.error('Error updating team:', error);
@@ -50,7 +50,7 @@ export const updateTeam = async (id: number, team: Partial<Team>): Promise<Team>
 // Delete a team by ID
 export const deleteTeam = async (id: number): Promise<void> => {
     try {
-        await api.delete(`/teams/${id}`);
+        await api.delete(`/api/admin/teams/${id}`);
     } catch (error) {
         console.error('Error deleting team:', error);
         throw error;
