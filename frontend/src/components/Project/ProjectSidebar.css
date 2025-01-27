@@ -130,17 +130,17 @@
     background-color: #28a745;
     color: white;
     border: none;
-    border-radius: 50%;  /* Make it circular */
-    width: 36px;         /* Increased size */
-    height: 36px;        /* Increased size */
+    border-radius: 50%;
+    width: 28px;         /* Reduced from 36px */
+    height: 28px;        /* Reduced from 36px */
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 1.2rem;   /* Increased icon size */
-    padding: 0;          /* Remove padding */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* Add subtle shadow */
+    font-size: 1rem;    /* Reduced from 1.2rem */
+    padding: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .add-project-button:hover {

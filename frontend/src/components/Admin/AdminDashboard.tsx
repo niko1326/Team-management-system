@@ -18,13 +18,6 @@ const AdminDashboard: React.FC = () => {
     const [editingTeam, setEditingTeam] = useState<Team | null>(null);
 
     useEffect(() => {
-        if (!isAdmin) {
-            console.log('Not admin, redirecting to login');
-            navigate('/login');
-        }
-    }, [isAdmin, navigate]);
-
-    useEffect(() => {
         const loadTeams = async () => {
             try {
                 const teamsData = await fetchTeams();
@@ -65,10 +58,6 @@ const AdminDashboard: React.FC = () => {
         setShowTeamForm(false);
         setEditingTeam(null);
     };
-
-    if (!isAdmin) {
-        return <div>Access Denied</div>;
-    }
 
     return (
         <div className="dashboard-container">

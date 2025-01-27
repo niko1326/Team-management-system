@@ -151,21 +151,32 @@ const TaskManager: React.FC<TaskManagerProps> = ({
             )}
             <div className="add-task-section" ref={addTaskRef}>
                 {showAddTask ? (
-                    <div className="add-task-form">
+                    <form 
+                        className="add-task-form"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleAddTask();
+                        }}
+                    >
                         <input
                             type="text"
                             placeholder="Enter task title"
                             value={newTaskTitle}
                             onChange={(e) => setNewTaskTitle(e.target.value)}
                             className="task-input"
+                            autoFocus
                         />
-                        <button onClick={handleAddTask} className="add-button">
+                        <button type="submit" className="add-button">
                             Add Task
                         </button>
-                        <button onClick={() => setShowAddTask(false)} className="cancel-button">
+                        <button 
+                            type="button" 
+                            onClick={() => setShowAddTask(false)} 
+                            className="cancel-button"
+                        >
                             Cancel
                         </button>
-                    </div>
+                    </form>
                 ) : (
                     <button onClick={() => setShowAddTask(true)} className="add-task-button">
                         + Add Task

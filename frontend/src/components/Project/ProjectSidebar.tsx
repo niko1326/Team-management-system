@@ -1,7 +1,7 @@
 import React from 'react';
 import { Project } from '../../types/Project';
 import { deleteProject } from '../../services/projectService';
-import { FaTrash, FaEdit, FaPlus } from 'react-icons/fa';
+import { FaTrash, FaEdit } from 'react-icons/fa';
 import './ProjectSidebar.css';
 
 interface ProjectSidebarProps {
@@ -40,13 +40,6 @@ const ProjectSidebar: React.FC<ProjectSidebarProps> = ({
         <div className="project-sidebar">
             <div className="project-header">
                 <h2>Projects</h2>
-                <button 
-                    className="add-project-button"
-                    onClick={onAddProject}
-                    title="Add new project"
-                >
-                    <FaPlus />
-                </button>
             </div>
             <div className="project-list">
                 {projects.map((project) => (
