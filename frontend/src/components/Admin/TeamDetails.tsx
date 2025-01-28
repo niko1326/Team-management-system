@@ -221,37 +221,40 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                     </div>
                 </div>
             ) : (
-                <div className="users-list">
-                    <div className="users-header">
-                        <h2>Users</h2>
+                <div className="project-manager">
+                    <div className="project-list">
+                        {allUsers.map(user => (
+                            <div key={user.id} className="project-item">
+                                <div className="project-content">
+                                    <div className="project-text">
+                                        <h3>{user.username}</h3>
+                                        <p className="project-description">{user.email}</p>
+                                        {user.teams && user.teams.length > 0 && (
+                                            <p className="project-description">
+                                                Teams: {user.teams.map(t => t.name).join(', ')}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <div className="user-controls">
+                                        <input
+                                            type="checkbox"
+                                            checked={user.teams?.some(t => t.id === teamId)}
+                                            onChange={(e) => handleUserAssignment(user.id, e.target.checked)}
+                                        />
+                                        {user.isAdmin && <span className="admin-badge">Admin</span>}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    <div className="add-project-section">
                         <button 
-                            className="add-user-button"
+                            className="add-project-button"
                             onClick={() => setShowAddUser(true)}
                         >
                             <FaPlus /> Add User
                         </button>
                     </div>
-                    {allUsers.map(user => (
-                        <div key={user.id} className="user-card">
-                            <div className="user-checkbox">
-                                <input
-                                    type="checkbox"
-                                    checked={user.teams?.some(t => t.id === teamId)}
-                                    onChange={(e) => handleUserAssignment(user.id, e.target.checked)}
-                                />
-                                <span className="user-name">{user.username}</span>
-                            </div>
-                            <div className="user-info">
-                                <p>{user.email}</p>
-                                {user.teams && user.teams.length > 0 && (
-                                    <div className="user-teams">
-                                        Teams: {user.teams.map(t => t.name).join(', ')}
-                                    </div>
-                                )}
-                                {user.isAdmin && <span className="admin-badge">Admin</span>}
-                            </div>
-                        </div>
-                    ))}
                 </div>
             )}
             
