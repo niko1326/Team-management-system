@@ -34,3 +34,11 @@ org.h2.jdbc.JdbcSQLSyntaxErrorException: Table "USER_CREDENTIALS" not found; SQL
 SELECT * FROM USER_CREDENTIALS [42102-224]
 2025-01-28 09:52:29.855545+01:00 jdbc[4]: exception
 org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2025-01-28 13:35:47.927480+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2025-01-28 14:37:01.873450+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2025-01-28 14:44:43.114226+01:00 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
+2025-01-28 15:10:54.491720+01:00 jdbc[14]: exception
+org.h2.jdbc.JdbcSQLNonTransientException: The object is already closed [90007-224]
