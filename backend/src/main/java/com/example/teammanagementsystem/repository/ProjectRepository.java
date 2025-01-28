@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long> {
@@ -19,4 +20,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByTeam(Team team);
 
     List<Project> findByTeamId(Long teamId);
+
+    Optional<Project> findByName(String name);
 }
