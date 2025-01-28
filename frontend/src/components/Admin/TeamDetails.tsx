@@ -4,11 +4,12 @@ import { Project } from '../../types/Project';
 import { User } from '../../types/User';
 import { getTeamById } from '../../services/teamService';
 import { fetchProjectsByTeamId, deleteProject, createProject } from '../../services/projectService';
-import { fetchAllUsers, assignUserToTeam, addUserToTeam, removeUserFromTeam, updateUser } from '../../services/userService';
+import { fetchAllUsers, assignUserToTeam, addUserToTeam, removeUserFromTeam, updateUser, createUser, deleteUser } from '../../services/userService';
 import './AdminDashboard.css';
-import { FaTrash, FaPlus } from 'react-icons/fa';
+import { FaTrash, FaPlus, FaEdit } from 'react-icons/fa';
 import ProjectDetails from '../Project/ProjectDetails';
 import UserForm from './UserForm';
+import { generateRandomUser } from '../../services/randomUserService';
 
 interface TeamDetailsProps {
     teamId: number;
@@ -28,6 +29,7 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
     const [editingProject, setEditingProject] = useState<Project | null>(null);
     const addProjectRef = useRef<HTMLDivElement | null>(null);
     const [showAddUser, setShowAddUser] = useState<boolean>(false);
+    const [editingUser, setEditingUser] = useState<User | null>(null);
 
     const loadTeamData = async () => {
         try {
@@ -157,13 +159,52 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
         }
     };
 
+    const handleGenerateRandomUser = async () => {
+        try {
+            const randomUserData = await generateRandomUser();
+            const newUser = await createUser(randomUserData);
+            await addUserToTeam(teamId, newUser.id);
+            await loadTeamData();
+        } catch (error) {
+            setError('Failed to generate random user');
+            console.error('Error generating random user:', error);
+        }
+    };
+
+    const handleEditUser = (user: User) => {
+        setEditingUser(user);
+        setShowAddUser(true);
+    };
+
+    const handleDeleteUser = async (userId: number) => {
+        if (window.confirm('Are you sure you want to delete this user?')) {
+            try {
+                await deleteUser(userId);
+                setAllUsers(prev => prev.filter(user => user.id !== userId));
+            } catch (error) {
+                setError('Failed to delete user');
+                console.error('Error deleting user:', error);
+            }
+        }
+    };
+
     if (loading) return <div>Loading team details...</div>;
     if (error) return <div className="error-message">{error}</div>;
     if (!team) return <div>Team not found</div>;
 
     return (
         <div className="team-details">
-            <h2>{team.name}</h2>
+            <div className="team-header">
+                <h2>{team.name}</h2>
+                {viewMode === 'users' && (
+                    <button 
+                        className="generate-user-button"
+                        onClick={handleGenerateRandomUser}
+                    >
+                        <FaPlus /> Generate Random User
+                    </button>
+                )}
+            </div>
             {viewMode === 'projects' ? (
                 <div className="project-manager">
                     <div className="project-list">
@@ -241,6 +282,20 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
                                             checked={user.teams?.some(t => t.id === teamId)}
                                             onChange={(e) => handleUserAssignment(user.id, e.target.checked)}
                                         />
+                                        <button 
+                                            className="edit-button"
+                                            onClick={() => handleEditUser(user)}
+                                            title="Edit User"
+                                        >
+                                            <FaEdit />
+                                        </button>
+                                        <button 
+                                            className="delete-button"
+                                            onClick={() => handleDeleteUser(user.id)}
+                                            title="Delete User"
+                                        >
+                                            <FaTrash />
+                                        </button>
                                         {user.isAdmin && <span className="admin-badge">Admin</span>}
                                     </div>
                                 </div>
@@ -269,12 +324,21 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
             {showAddUser && (
                 <UserForm
                     teamId={teamId}
-                    onClose={() => setShowAddUser(false)}
-                    onUserCreated={async (newUser) => {
-                        setAllUsers(prev => [...prev, newUser]);
+                    onClose={() => {
                         setShowAddUser(false);
+                        setEditingUser(null);
+                    }}
+                    onUserCreated={async (newUser) => {
+                        setAllUsers(prev => 
+                            editingUser 
+                                ? prev.map(u => u.id === editingUser.id ? newUser : u)
+                                : [...prev, newUser]
+                        );
+                        setShowAddUser(false);
+                        setEditingUser(null);
                         await loadTeamData();
                     }}
+                    editingUser={editingUser}
                 />
             )}
         </div>

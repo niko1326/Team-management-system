@@ -56,7 +56,7 @@ export const assignUserToTeam = async (userId: number, teamId: number | null): P
     }
 };
 
-export const updateUser = async (userId: number, updates: Partial<User>): Promise<User> => {
+export const updateUser = async (userId: number, updates: Partial<User & { password: string }>): Promise<User> => {
     try {
         const response = await api.put(`/api/admin/users/${userId}`, updates);
         return response.data;
@@ -88,6 +88,15 @@ export const updateUserRole = async (userId: number, isAdmin: boolean): Promise<
         return response.data;
     } catch (error) {
         console.error('Error updating user role:', error);
+        throw error;
+    }
+};
+
+export const deleteUser = async (userId: number): Promise<void> => {
+    try {
+        await api.delete(`/api/admin/users/${userId}`);
+    } catch (error) {
+        console.error('Error deleting user:', error);
         throw error;
     }
 }; 

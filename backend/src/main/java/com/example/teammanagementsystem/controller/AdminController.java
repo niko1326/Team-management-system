@@ -78,4 +78,16 @@ public class AdminController {
     public ResponseEntity<List<Project>> getProjectsByTeamId(@PathVariable Long teamId) {
         return ResponseEntity.ok(projectService.getProjectsByTeamId(teamId));
     }
+
+    @DeleteMapping("/users/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/users/{userId}")
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody User userUpdates) {
+        User updatedUser = userService.updateUser(userId, userUpdates);
+        return ResponseEntity.ok(updatedUser);
+    }
 } 

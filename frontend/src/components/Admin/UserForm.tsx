@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../../types/User';
-import { createUser } from '../../services/userService';
+import { createUser, updateUser } from '../../services/userService';
 import { FaTimes } from 'react-icons/fa';
 import './AdminDashboard.css';
 
@@ -18,23 +18,39 @@ const UserForm: React.FC<UserFormProps> = ({ teamId, onClose, onUserCreated, edi
         password: '',
         isAdmin: editingUser?.isAdmin || false
     });
+    const [showPassword, setShowPassword] = useState(false);
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const newUser = await createUser(userData);
-            onUserCreated(newUser);
-            onClose();
+            let user;
+            if (editingUser) {
+                const updates: Partial<User> = {
+                    username: userData.username,
+                    email: userData.email,
+                    isAdmin: userData.isAdmin,
+                };
+                if (isChangingPassword && userData.password) {
+                    updates.password = userData.password;
+                }
+                user = await updateUser(editingUser.id, updates);
+            } else {
+                user = await createUser(userData);
+            }
+            onUserCreated(user);
         } catch (error) {
-            console.error('Error creating user:', error);
+            console.error('Error saving user:', error);
         }
     };
 
     return (
-        <div className="task-details">
-            <div className="task-details-content">
-                <button className="close-button" onClick={onClose}><FaTimes /></button>
-                <h2>{editingUser ? 'Edit User' : 'Create New User'}</h2>
+        <div className="modal">
+            <div className="modal-content">
+                <button className="close-button" onClick={onClose}>
+                    <FaTimes />
+                </button>
+                <h2>{editingUser ? 'Edit User' : 'Add New User'}</h2>
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label htmlFor="username">Username</label>
@@ -56,18 +72,55 @@ const UserForm: React.FC<UserFormProps> = ({ teamId, onClose, onUserCreated, edi
                             required
                         />
                     </div>
-                    {!editingUser && (
-                        <div className="form-group">
-                            <label htmlFor="password">Password</label>
-                            <input
-                                id="password"
-                                type="password"
-                                value={userData.password}
-                                onChange={(e) => setUserData({...userData, password: e.target.value})}
-                                required
-                            />
-                        </div>
-                    )}
+                    <div className="form-group">
+                        {editingUser ? (
+                            <div className="password-section">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={isChangingPassword}
+                                        onChange={(e) => setIsChangingPassword(e.target.checked)}
+                                    />
+                                    Change Password
+                                </label>
+                                {isChangingPassword && (
+                                    <div className="password-input-group">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            value={userData.password}
+                                            onChange={(e) => setUserData({...userData, password: e.target.value})}
+                                            placeholder="New password"
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="toggle-password"
+                                        >
+                                            {showPassword ? "Hide" : "Show"}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div className="password-input-group">
+                                <label htmlFor="password">Password</label>
+                                <input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={userData.password}
+                                    onChange={(e) => setUserData({...userData, password: e.target.value})}
+                                    required
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="toggle-password"
+                                >
+                                    {showPassword ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     <div className="form-group">
                         <label>
                             <input

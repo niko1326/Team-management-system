@@ -463,4 +463,90 @@
     padding: 20px;
     overflow-y: auto;
     z-index: 1000;
+}
+
+.generate-user-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.generate-user-button:hover {
+    background-color: #45a049;
+}
+
+.user-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.edit-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.edit-button:hover {
+    background-color: #45a049;
+}
+
+.delete-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-button:hover {
+    background-color: #da190b;
+}
+
+.team-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.team-header h2 {
+    margin: 0;
+}
+
+.password-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-password {
+    padding: 5px 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.toggle-password:hover {
+    background-color: #5a6268;
+}
+
+.password-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 } 
