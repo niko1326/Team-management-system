@@ -5,12 +5,13 @@ import { FaTimes } from 'react-icons/fa';
 import './AdminDashboard.css';
 
 interface UserFormProps {
+    teamId: number;
     onClose: () => void;
     onUserCreated: (user: User) => void;
     editingUser?: User | null;
 }
 
-const UserForm: React.FC<UserFormProps> = ({ onClose, onUserCreated, editingUser }) => {
+const UserForm: React.FC<UserFormProps> = ({ teamId, onClose, onUserCreated, editingUser }) => {
     const [userData, setUserData] = useState({
         username: editingUser?.username || '',
         email: editingUser?.email || '',

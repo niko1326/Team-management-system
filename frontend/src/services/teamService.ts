@@ -1,6 +1,8 @@
 import api from './api';
 import { Team } from '../types/Team';
 import { useAuth } from '../contexts/AuthContext';
+import { User } from '../types/User';
+import { Project } from '../types/Project';
 
 // Fetch all teams (admin only)
 export const fetchTeams = async (): Promise<Team[]> => {
@@ -53,6 +55,26 @@ export const deleteTeam = async (id: number): Promise<void> => {
         await api.delete(`/api/admin/teams/${id}`);
     } catch (error) {
         console.error('Error deleting team:', error);
+        throw error;
+    }
+};
+
+export const getTeamUsers = async (teamId: number): Promise<User[]> => {
+    try {
+        const response = await api.get(`/api/admin/teams/${teamId}/users`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching team users:', error);
+        throw error;
+    }
+};
+
+export const getTeamProjects = async (teamId: number): Promise<Project[]> => {
+    try {
+        const response = await api.get(`/api/admin/teams/${teamId}/projects`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching team projects:', error);
         throw error;
     }
 };

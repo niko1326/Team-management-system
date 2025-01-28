@@ -11,6 +11,7 @@ import { fetchProjects } from '../../services/projectService';
 import { fetchTasksByProjectId } from '../../services/taskService';
 import './Dashboard.css';
 import { useNavigate } from 'react-router-dom';
+import { Team } from '../../types/Team';
 
 const Dashboard: React.FC = () => {
     const { user, logout } = useAuth();
@@ -23,6 +24,7 @@ const Dashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [showProjectForm, setShowProjectForm] = useState(false);
+    const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
 
     const loadProjects = async () => {
         try {
@@ -149,10 +151,15 @@ const Dashboard: React.FC = () => {
                     />
                     {(selectedTask || editingProject || showProjectForm) && (
                         showProjectForm ? (
-                            <ProjectForm
-                                onClose={() => setShowProjectForm(false)}
-                                onProjectCreated={handleProjectCreated}
-                            />
+                            selectedTeam ? (
+                                <ProjectForm
+                                    teamId={selectedTeam.id}
+                                    onClose={() => setShowProjectForm(false)}
+                                    onProjectCreated={handleProjectCreated}
+                                />
+                            ) : (
+                                <div className="error-message">Please select a team first</div>
+                            )
                         ) : editingProject ? (
                             <ProjectDetails
                                 project={editingProject}

@@ -4,11 +4,12 @@ import { createProject } from '../../services/projectService';
 import '../Task/TaskDetails.css';
 
 interface ProjectFormProps {
+    teamId: number;
     onClose: () => void;
     onProjectCreated: (project: Project) => void;
 }
 
-const ProjectForm: React.FC<ProjectFormProps> = ({ onClose, onProjectCreated }) => {
+const ProjectForm: React.FC<ProjectFormProps> = ({ teamId, onClose, onProjectCreated }) => {
     const [newProject, setNewProject] = useState<Partial<Project>>({
         name: '',
         description: '',

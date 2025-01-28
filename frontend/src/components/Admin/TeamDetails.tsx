@@ -265,6 +265,7 @@ const TeamDetails: React.FC<TeamDetailsProps> = ({ teamId, viewMode }) => {
 
             {showAddUser && (
                 <UserForm
+                    teamId={teamId}
                     onClose={() => setShowAddUser(false)}
                     onUserCreated={async (newUser) => {
                         setAllUsers(prev => [...prev, newUser]);
